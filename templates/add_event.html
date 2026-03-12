@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Add Event - College Event Radar{% endblock %}
+
+{% block content %}
+    <h2>➕ Create New Event</h2>
+
+    <form action="/insert" method="POST">
+        <div class="form-group">
+            <label for="name" class="required">Event Name</label>
+            <input type="text" id="name" name="name" placeholder="e.g., Annual Tech Conference" required>
+        </div>
+
+        <div class="form-group">
+            <label for="date" class="required">Date</label>
+            <input type="date" id="date" name="date" required>
+        </div>
+
+        <div class="form-group">
+            <label for="time">Time</label>
+            <input type="time" id="time" name="time" value="09:00" required>
+        </div>
+
+        <div class="form-group">
+            <label for="location" class="required">Location</label>
+            <input type="text" id="location" name="location" placeholder="e.g., Main Auditorium" required>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" name="category">
+                <option value="General">General</option>
+                <option value="Academic">Academic</option>
+                <option value="Sports">Sports</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Technical">Technical</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Competition">Competition</option>
+                <option value="Social">Social</option>
+                {% for cat in categories %}
+                    {% if cat not in ['General', 'Academic', 'Sports', 'Cultural', 'Technical', 'Workshop', 'Competition', 'Social'] %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="organizer">Organizer</label>
+            <input type="text" id="organizer" name="organizer" placeholder="e.g., Department / Club Name">
+        </div>
+
+        <div class="form-group">
+            <label for="max_attendees">Max Attendees</label>
+            <input type="number" id="max_attendees" name="max_attendees" min="0" placeholder="Leave blank for unlimited">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Describe your event in detail..."></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">✓ Create Event</button>
+            <a href="/" class="btn btn-secondary">✕ Cancel</a>
+        </div>
+    </form>
+{% endblock %}

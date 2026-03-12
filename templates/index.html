@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Events - College Event Radar{% endblock %}
+
+{% block content %}
+    <h1>📅 All College Events</h1>
+
+    <!-- Search and Filter -->
+    <div class="search-filter">
+        <form method="GET" action="/">
+            <div class="form-group">
+                <label for="search">Search Events</label>
+                <input type="text" id="search" name="search" placeholder="Search by name, location, or description..." value="{{ search }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if cat == category %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="sort">Sort By</label>
+                <select id="sort" name="sort">
+                    <option value="date_asc" {% if sort == 'date_asc' %}selected{% endif %}>Date (Earliest First)</option>
+                    <option value="date_desc" {% if sort == 'date_desc' %}selected{% endif %}>Date (Latest First)</option>
+                    <option value="name" {% if sort == 'name' %}selected{% endif %}>Event Name (A-Z)</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn">🔍 Search</button>
+            {% if search or category %}
+                <a href="/" class="btn btn-secondary" style="margin-left: 5px;">✕ Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Events Table -->
+    {% if events %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date & Time</th>
+                    <th>Location</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td><strong>{{ event[1] }}</strong></td>
+                    <td>
+                        <div>{{ event[2].strftime('%d %b %Y') }}</div>
+                        <span class="text-muted">{{ event[3] }}</span>
+                    </td>
+                    <td>📍 {{ event[4] }}</td>
+                    <td><span class="badge badge-primary">{{ event[6] }}</span></td>
+                    <td>
+                        {% if event[5] %}
+                            {{ event[5][:50] }}{% if event[5]|length > 50 %}...{% endif %}
+                        {% else %}
+                            <span class="text-muted">No description</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="/edit/{{ event[0] }}" class="btn btn-small btn-secondary" title="Edit Event">✏️ Edit</a>
+                            <form action="/delete/{{ event[0] }}" method="GET" style="display:inline;" 
+                                  onsubmit="return confirm('Are you sure you want to delete this event?');">
+                                <button type="submit" class="btn btn-small btn-danger" title="Delete Event">🗑️ Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="no-events">
+            <p>📭 No events found</p>
+            <p>{% if search %}Try a different search term or{% endif %} <a href="/add" style="color: white; text-decoration: underline; font-weight: bold;">create your first event</a></p>
+        </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/add" class="btn" style="padding: 15px 40px; font-size: 1.1em;">+ Create New Event</a>
+    </div>
+{% endblock %}
