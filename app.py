@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, session
 import pymysql
 from datetime import datetime
+import hashlib
+from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'
+app.secret_key = 'your_secret_key_here_please_change_it'
 
 # MySQL Connection Function
 def get_db_connection():
@@ -19,8 +21,146 @@ def get_db_connection():
         print(f"Error connecting to MySQL: {e}")
         return None
 
-# Dashboard - Statistics and Overview
+# Hash password function
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+# Decorator to check if user is logged in
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please login first!', 'error')
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Decorator to check if user is admin
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please login first!', 'error')
+            return redirect('/login')
+        
+        if session.get('role') != 'admin':
+            flash('You do not have permission to access this page!', 'error')
+            return redirect('/')
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Login Page
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '').strip()
+        
+        if not email or not password:
+            flash('Please enter email and password!', 'error')
+            return render_template('login.html')
+        
+        try:
+            db = get_db_connection()
+            if db is None:
+                flash('Database connection failed!', 'error')
+                return render_template('login.html')
+            
+            cursor = db.cursor()
+            cursor.execute("SELECT id, name, email, role FROM users WHERE email = %s AND password = %s", 
+                         (email, hash_password(password)))
+            user = cursor.fetchone()
+            cursor.close()
+            db.close()
+            
+            if user:
+                session['user_id'] = user[0]
+                session['name'] = user[1]
+                session['email'] = user[2]
+                session['role'] = user[3]
+                
+                flash(f'Welcome back, {user[1]}!', 'success')
+                return redirect('/')
+            else:
+                flash('Invalid email or password!', 'error')
+                return render_template('login.html')
+        
+        except pymysql.Error as e:
+            flash(f'Error logging in: {e}', 'error')
+            return render_template('login.html')
+    
+    return render_template('login.html')
+
+# Register Page
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+        role = request.form.get('role', 'student').strip()
+        
+        if not all([name, email, password, confirm_password]):
+            flash('Please fill in all fields!', 'error')
+            return render_template('register.html')
+        
+        if password != confirm_password:
+            flash('Passwords do not match!', 'error')
+            return render_template('register.html')
+        
+        if len(password) < 6:
+            flash('Password must be at least 6 characters!', 'error')
+            return render_template('register.html')
+        
+        if role not in ['admin', 'student']:
+            role = 'student'
+        
+        try:
+            db = get_db_connection()
+            if db is None:
+                flash('Database connection failed!', 'error')
+                return render_template('register.html')
+            
+            cursor = db.cursor()
+            
+            # Check if email already exists
+            cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+            if cursor.fetchone():
+                flash('Email already registered!', 'error')
+                cursor.close()
+                db.close()
+                return render_template('register.html')
+            
+            # Insert new user
+            cursor.execute(
+                "INSERT INTO users (name, email, password, role) VALUES (%s, %s, %s, %s)",
+                (name, email, hash_password(password), role)
+            )
+            db.commit()
+            cursor.close()
+            db.close()
+            
+            flash('Registration successful! Please login.', 'success')
+            return redirect('/login')
+        
+        except pymysql.Error as e:
+            flash(f'Error registering: {e}', 'error')
+            return render_template('register.html')
+    
+    return render_template('register.html')
+
+# Logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out!', 'success')
+    return redirect('/')
+
+# Dashboard - Statistics and Overview (Admin only)
 @app.route('/dashboard')
+@admin_required
 def dashboard():
     try:
         db = get_db_connection()
@@ -123,8 +263,9 @@ def index():
         flash(f'Error retrieving events: {e}', 'error')
         return render_template("index.html", events=[])
 
-# Add Event Page
+# Add Event Page (Admin only)
 @app.route('/add')
+@admin_required
 def add():
     try:
         db = get_db_connection()
@@ -141,8 +282,9 @@ def add():
     except:
         return render_template("add_event.html", categories=[])
 
-# Insert Event
+# Insert Event (Admin only)
 @app.route('/insert', methods=['POST'])
+@admin_required
 def insert():
     try:
         name = request.form.get('name', '').strip()
@@ -178,8 +320,9 @@ def insert():
         flash(f'Error adding event: {e}', 'error')
         return redirect('/add')
 
-# Edit Event Page
+# Edit Event Page (Admin only)
 @app.route('/edit/<int:event_id>')
+@admin_required
 def edit(event_id):
     try:
         db = get_db_connection()
@@ -206,8 +349,9 @@ def edit(event_id):
         flash(f'Error loading event: {e}', 'error')
         return redirect('/')
 
-# Update Event
+# Update Event (Admin only)
 @app.route('/update/<int:event_id>', methods=['POST'])
+@admin_required
 def update(event_id):
     try:
         name = request.form.get('name', '').strip()
@@ -243,8 +387,9 @@ def update(event_id):
         flash(f'Error updating event: {e}', 'error')
         return redirect(f'/edit/{event_id}')
 
-# Delete Event
+# Delete Event (Admin only)
 @app.route('/delete/<int:event_id>')
+@admin_required
 def delete(event_id):
     try:
         db = get_db_connection()
