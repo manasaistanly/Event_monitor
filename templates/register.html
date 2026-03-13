@@ -3,52 +3,54 @@
 {% block title %}Register - College Event Radar{% endblock %}
 
 {% block content %}
-    <div style="max-width: 500px; margin: 50px auto;">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">📝 Register</h3>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="/register" style="all: unset;">
-                    <div class="form-group">
-                        <input type="text" id="name" name="name" placeholder=" " required>
-                        <label for="name">Full Name</label>
-                    </div>
-
-                    <div class="form-group">
-                        <input type="email" id="email" name="email" placeholder=" " required>
-                        <label for="email">Email</label>
-                    </div>
-
-                    <div class="form-group">
-                        <select id="role" name="role" required>
-                            <option value="" disabled selected></option>
-                            <option value="student">Student</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                        <label for="role">Role</label>
-                    </div>
-
-                    <div class="form-group">
-                        <input type="password" id="password" name="password" placeholder=" " required minlength="6">
-                        <label for="password">Password</label>
-                    </div>
-
-                    <div class="form-group">
-                        <input type="password" id="confirm_password" name="confirm_password" placeholder=" " required minlength="6">
-                        <label for="confirm_password">Confirm Password</label>
-                    </div>
-
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" class="btn" style="flex: 1; margin: 0;">Register</button>
-                        <a href="/" class="btn btn-secondary" style="flex: 1; margin: 0; text-align: center;">Cancel</a>
-                    </div>
-                </form>
-
-                <p style="text-align: center; margin-top: 20px; color: #999;">
-                    Already have an account? <a href="/login">Login here</a>
-                </p>
-            </div>
+    <div class="form-card" style="max-width: 550px;">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+            <h2 style="justify-content: center; border: none; margin-bottom: 0.5rem;">Join EventRadar</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Your gateway to campus happenings.</p>
         </div>
+
+        <form method="POST" action="/register">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="name">Full Name</label>
+                    <input type="text" id="name" name="name" class="form-input" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="role">Your Role</label>
+                    <select id="role" name="role" class="form-input" required>
+                        <option value="student">Student</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="name@college.edu" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required minlength="6">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="confirm_password">Confirm</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-input" placeholder="••••••••" required minlength="6">
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+                <a href="/" class="btn btn-secondary" style="width: 100%;">Cancel</a>
+            </div>
+        </form>
+
+        <p style="text-align: center; margin-top: 2.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+            Already have an account? <a href="/login" style="color: var(--primary); font-weight: 700; text-decoration: none;">Sign in here</a>
+        </p>
     </div>
 {% endblock %}

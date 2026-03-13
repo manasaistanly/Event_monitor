@@ -3,66 +3,74 @@
 {% block title %}Add Event - College Event Radar{% endblock %}
 
 {% block content %}
-    <h2>➕ Create New Event</h2>
-
-    <form action="/insert" method="POST">
-        <div class="form-group">
-            <label for="name" class="required">Event Name</label>
-            <input type="text" id="name" name="name" placeholder="e.g., Annual Tech Conference" required>
+    <div class="form-card" style="max-width: 700px;">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✨</div>
+            <h2 style="justify-content: center; border: none; margin-bottom: 0.5rem;">Host a New Event</h2>
+            <p style="color: var(--text-secondary); font-size: 1rem;">Fill in the details below to broadcast your event to campus.</p>
         </div>
 
-        <div class="form-group">
-            <label for="date" class="required">Date</label>
-            <input type="date" id="date" name="date" required>
-        </div>
+        <form action="/insert" method="POST">
+            <div class="form-group">
+                <label class="form-label" for="name">Event Name</label>
+                <input type="text" id="name" name="name" class="form-input" placeholder="e.g., Annual Tech Symposium" required>
+            </div>
 
-        <div class="form-group">
-            <label for="time">Time</label>
-            <input type="time" id="time" name="time" value="09:00" required>
-        </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="date">Date</label>
+                    <input type="date" id="date" name="date" class="form-input" required>
+                </div>
 
-        <div class="form-group">
-            <label for="location" class="required">Location</label>
-            <input type="text" id="location" name="location" placeholder="e.g., Main Auditorium" required>
-        </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="time">Starting Time</label>
+                    <input type="time" id="time" name="time" class="form-input" value="09:00" required>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="category">Category</label>
-            <select id="category" name="category">
-                <option value="General">General</option>
-                <option value="Academic">Academic</option>
-                <option value="Sports">Sports</option>
-                <option value="Cultural">Cultural</option>
-                <option value="Technical">Technical</option>
-                <option value="Workshop">Workshop</option>
-                <option value="Competition">Competition</option>
-                <option value="Social">Social</option>
-                {% for cat in categories %}
-                    {% if cat not in ['General', 'Academic', 'Sports', 'Cultural', 'Technical', 'Workshop', 'Competition', 'Social'] %}
-                        <option value="{{ cat }}">{{ cat }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-        </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="location">Location</label>
+                    <input type="text" id="location" name="location" class="form-input" placeholder="e.g., Main Hall" required>
+                </div>
 
-        <div class="form-group">
-            <label for="organizer">Organizer</label>
-            <input type="text" id="organizer" name="organizer" placeholder="e.g., Department / Club Name">
-        </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="category">Category</label>
+                    <select id="category" name="category" class="form-input">
+                        {% set default_cats = ['General', 'Academic', 'Sports', 'Cultural', 'Technical', 'Workshop', 'Competition', 'Social'] %}
+                        {% for cat in default_cats %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                        {% endfor %}
+                        {% for cat in categories %}
+                            {% if cat not in default_cats %}
+                                <option value="{{ cat }}">{{ cat }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="max_attendees">Max Attendees</label>
-            <input type="number" id="max_attendees" name="max_attendees" min="0" placeholder="Leave blank for unlimited">
-        </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="organizer">Organizer</label>
+                    <input type="text" id="organizer" name="organizer" class="form-input" placeholder="Club or Dept name">
+                </div>
 
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description" placeholder="Describe your event in detail..."></textarea>
-        </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="max_attendees">Attendee Limit</label>
+                    <input type="number" id="max_attendees" name="max_attendees" class="form-input" min="0" placeholder="Unlimited">
+                </div>
+            </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn">✓ Create Event</button>
-            <a href="/" class="btn btn-secondary">✕ Cancel</a>
-        </div>
-    </form>
+            <div class="form-group" style="margin-bottom: 3rem;">
+                <label class="form-label" for="description">Event Description</label>
+                <textarea id="description" name="description" class="form-input" rows="4" placeholder="Tell everyone what this event is about..."></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <button type="submit" class="btn btn-primary">Publish Event</button>
+                <a href="/" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 {% endblock %}

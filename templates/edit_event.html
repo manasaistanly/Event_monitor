@@ -3,77 +3,79 @@
 {% block title %}Edit Event - College Event Radar{% endblock %}
 
 {% block content %}
-    <h2> Edit Event</h2>
-
-    <form action="/update/{{ event[0] }}" method="POST">
-        <div class="form-group">
-            <label for="name" class="required">Event Name</label>
-            <input type="text" id="name" name="name" value="{{ event[1] }}" placeholder="e.g., Annual Tech Conference" required>
+    <div class="form-card" style="max-width: 700px;">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✍️</div>
+            <h2 style="justify-content: center; border: none; margin-bottom: 0.5rem;">Refine Event Details</h2>
+            <p style="color: var(--text-secondary); font-size: 1rem;">Updating information for <strong>{{ event[1] }}</strong></p>
         </div>
 
-        <div class="form-group">
-            <label for="date" class="required">Date</label>
-            <input type="date" id="date" name="date" value="{{ event[2].strftime('%Y-%m-%d') }}" required>
-        </div>
-
-        <div class="form-group">
-            <label for="time">Time</label>
-            <input type="time" id="time" name="time" value="{{ event[3] }}" required>
-        </div>
-
-        <div class="form-group">
-            <label for="location" class="required">Location</label>
-            <input type="text" id="location" name="location" value="{{ event[4] }}" placeholder="e.g., Main Auditorium" required>
-        </div>
-
-        <div class="form-group">
-            <label for="category">Category</label>
-            <select id="category" name="category">
-                <option value="General" {% if event[6] == 'General' %}selected{% endif %}>General</option>
-                <option value="Academic" {% if event[6] == 'Academic' %}selected{% endif %}>Academic</option>
-                <option value="Sports" {% if event[6] == 'Sports' %}selected{% endif %}>Sports</option>
-                <option value="Cultural" {% if event[6] == 'Cultural' %}selected{% endif %}>Cultural</option>
-                <option value="Technical" {% if event[6] == 'Technical' %}selected{% endif %}>Technical</option>
-                <option value="Workshop" {% if event[6] == 'Workshop' %}selected{% endif %}>Workshop</option>
-                <option value="Competition" {% if event[6] == 'Competition' %}selected{% endif %}>Competition</option>
-                <option value="Social" {% if event[6] == 'Social' %}selected{% endif %}>Social</option>
-                {% for cat in categories %}
-                    {% if cat not in ['General', 'Academic', 'Sports', 'Cultural', 'Technical', 'Workshop', 'Competition', 'Social'] %}
-                        <option value="{{ cat }}" {% if event[6] == cat %}selected{% endif %}>{{ cat }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="organizer">Organizer</label>
-            <input type="text" id="organizer" name="organizer" value="{{ event[7] or '' }}" placeholder="e.g., Department / Club Name">
-        </div>
-
-        <div class="form-group">
-            <label for="max_attendees">Max Attendees</label>
-            <input type="number" id="max_attendees" name="max_attendees" min="0" value="{{ event[8] or '' }}" placeholder="Leave blank for unlimited">
-        </div>
-
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description" placeholder="Describe your event in detail...">{{ event[5] or '' }}</textarea>
-        </div>
-
-        <div class="event-details">
-            <div class="detail-item">
-                <strong>Created:</strong>
-                {{ event[9].strftime('%d %b %Y at %H:%M') if event[9] else 'Unknown' }}
+        <form action="/update/{{ event[0] }}" method="POST">
+            <div class="form-group">
+                <label class="form-label" for="name">Event Name</label>
+                <input type="text" id="name" name="name" class="form-input" value="{{ event[1] }}" required>
             </div>
-            <div class="detail-item">
-                <strong>Last Updated:</strong>
-                {{ event[10].strftime('%d %b %Y at %H:%M') if event[10] else 'Unknown' }}
-            </div>
-        </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn">✓ Update Event</button>
-            <a href="/" class="btn btn-secondary">✕ Cancel</a>
-        </div>
-    </form>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="date">Date</label>
+                    <input type="date" id="date" name="date" class="form-input" value="{{ event[2].strftime('%Y-%m-%d') }}" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="time">Starting Time</label>
+                    <input type="time" id="time" name="time" class="form-input" value="{{ event[3] }}" required>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="location">Location</label>
+                    <input type="text" id="location" name="location" class="form-input" value="{{ event[4] }}" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="category">Category</label>
+                    <select id="category" name="category" class="form-input">
+                        {% set default_cats = ['General', 'Academic', 'Sports', 'Cultural', 'Technical', 'Workshop', 'Competition', 'Social'] %}
+                        {% for cat in default_cats %}
+                            <option value="{{ cat }}" {% if event[6] == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                        {% for cat in categories %}
+                            {% if cat not in default_cats %}
+                                <option value="{{ cat }}" {% if event[6] == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="organizer">Organizer</label>
+                    <input type="text" id="organizer" name="organizer" class="form-input" value="{{ event[7] or '' }}">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="max_attendees">Attendee Limit</label>
+                    <input type="number" id="max_attendees" name="max_attendees" class="form-input" min="0" value="{{ event[8] or '' }}">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label" for="description">Event Description</label>
+                <textarea id="description" name="description" class="form-input" rows="4">{{ event[5] or '' }}</textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 3rem; padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: var(--radius-sm);">
+                <div><strong>Created:</strong> {{ event[9].strftime('%d %b %Y') if event[9] else 'N/A' }}</div>
+                <div><strong>Last Update:</strong> {{ event[10].strftime('%d %b %Y') if event[10] else 'N/A' }}</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 {% endblock %}
