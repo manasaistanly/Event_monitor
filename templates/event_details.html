@@ -7,7 +7,7 @@
         <h1>{{ event[1] }}</h1>
         <div class="event-meta">
             <span class="badge badge-primary">{{ event[6] }}</span>
-            {% if event[10] == 1 %}
+            {% if is_registered %}
                 <span class="badge badge-success">You are registered</span>
             {% endif %}
         </div>
@@ -34,9 +34,9 @@
             <strong>👥 Capacity</strong>
             <div>
                 {% if event[8] and event[8] > 0 %}
-                    {{ event[11] }} / {{ event[8] }} registered
+                    {{ registrations_count }} / {{ event[8] }} registered
                     <div class="progress-bar" style="margin-top: 10px;">
-                        <div class="progress-fill" style="width: {{ (event[11] / event[8] * 100)|round }}%"></div>
+                        <div class="progress-fill" style="width: {{ (registrations_count / event[8] * 100)|round }}%"></div>
                     </div>
                 {% else %}
                     Unlimited
@@ -58,13 +58,13 @@
 
     <div class="event-actions">
         {% if session.get('user_id') %}
-            {% if event[10] == 1 %}
+            {% if is_registered %}
                 <a href="/unregister_event/{{ event[0] }}" class="btn btn-warning" 
                    onclick="return confirm('Are you sure you want to unregister from this event?');">
                    ❌ Unregister from Event
                 </a>
             {% else %}
-                {% if event[8] and event[8] > 0 and event[11] >= event[8] %}
+                {% if event[8] and event[8] > 0 and registrations_count >= event[8] %}
                     <span class="badge badge-danger" style="font-size: 1em; padding: 12px 24px;">Event is at full capacity</span>
                 {% else %}
                     <a href="/register_event/{{ event[0] }}" class="btn btn-success">
